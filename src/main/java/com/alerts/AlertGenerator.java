@@ -1,7 +1,7 @@
 package com.alerts;
 
-import com.data_management.DataStorage;
-import com.data_management.Patient;
+import com.datamanagement.DataStorage;
+import com.datamanagement.Patient;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data

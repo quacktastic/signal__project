@@ -2,13 +2,12 @@ package data_management;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.data_management.DataReader;
+import com.datamanagement.DataReader;
 import org.junit.jupiter.api.Test;
 
-import com.data_management.DataStorage;
-import com.data_management.PatientRecord;
+import com.datamanagement.DataStorage;
+import com.datamanagement.PatientRecord;
 
-import java.io.IOException;
 import java.util.List;
 
 class DataStorageTest {

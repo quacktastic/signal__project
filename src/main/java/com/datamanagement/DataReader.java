@@ -1,4 +1,4 @@
-package com.data_management;
+package com.datamanagement;
 
 import java.io.IOException;
 
