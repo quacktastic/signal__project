@@ -1,0 +1,55 @@
+@startuml
+'https://plantuml.com/class-diagram
+'skinparam classAttributeIconSize 0
+
+enum UserRole {
+DOCTOR
+NURSE
+ADMIN
+SYSTEM_INJECTOR
+}
+
+class User {
+- userID : String
+- userName : String
+- role : UserRole
++ User(userID : String, username : String, role : UserRole)
++ getUserName() : String
++ getRole(): UserRole
+}
+
+class DataStorage {
+    - patientDataMap : Map<String, List<PatientData>>
+    + storeData(data : PatientData) : void
+    + retrieveData(patientId : String) : List<PatientData>
+    + deleteData(patientId : String) : void
+    - executeSecureChannelWrite() : void
+}
+
+
+class DataRetriever {
+- verifyUser(role : UserRole, action : String) : boolean
++ retrieveData(patientId : String, storage : DataStorage, user : User) : List<PatientData>
++ deleteData(patientId : String, storage : DataStorage, user : User) : void
+
+}
+
+class PatientData {
+- patientId : String
+- metrics : Map<String, Double>
+- timestamp : long
++ PatientData(patientId : String, metrics : Map<String, Double>, timestamp : long)
++ getPatientId() : String
++ getMetrics() : Map<String, Double>
++ getTimestamp() : long
+}
+
+'--- Structural Layout Relationships ---
+User "0..*" o-- "1" UserRole : "assigned a >"
+DataStorage "1" *-- "0..*" PatientData : "retains secure historical logs of >"
+DataRetriever ..> DataStorage : "mediates queries and data purges on >"
+DataRetriever ..> User : "authenticates permissions of >"
+DataRetriever ..> PatientData : "delivers authenticated arrays to >"
+
+@enduml
+

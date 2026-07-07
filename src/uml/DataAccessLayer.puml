@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface DataListener {
+
+}
+
+class ConsoleDataListener {
+}
+
+class FileDataListener {
+}
+
+class TcpDataListener {
+}
+
+class WebSocketDataListener {
+}
+
+class DataParser {
+
+}
+
+class DataSourceAdapter {
+
+}
+
+
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+'skinparam classAttributeIconSize 0
+
+class AlertGenerator {
+    - dataStorage : DataStorage
+    - alertManager : AlertManager
+    + AlertGenerator(dataStorage : DataStorage, alertManager : AlertManager)
+    + evaluateData(data : PatientData) : void
+    - triggerAlert(alert : Alert) : void
+}
+
+class Alert {
+    - patientId : String
+    - condition : String
+    - timestamp : long
+    + getPatientId() : String
+    + getCondition() : String
+    + getTimestamp() : long
+}
+
+class AlertManager {
+    - activeTriggers : Set<String>
+    - autoClearOnRecovery : boolean
+    + handleAlert(alert : Alert) : void
+    + clearAlertMemory(patientId : String, condition : String) : void
+}
+
+class PatientThresholds {
+    - minSaturation : double
+    - minSystolic : double
+    - maxSystolic : double
+    - minDiastolic : double
+    - maxDiastolic : double
+    - maxCholesterol : double
+    - maxWhiteBloodCells : double
+    - minRedBloodCells : double
+    - minHeartRate : double
+    - maxHeartRate : double
+}
+
+'--- Dependencies & Core Relationships ---
+AlertGenerator "1" --> "1" AlertManager : "dispatches triggered alerts to"
+AlertGenerator ..> PatientThresholds : "queries limits during evaluation"
+AlertGenerator ..> Alert : "instantiates on threshold breach"
+AlertManager ..> Alert : "evaluates uniqueness of"
+
+@enduml
+

@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class PatientIdentifier {
++ matchPatientId(String patientId) : boolean
++ getPatientRecord(String patientId) : PatientRecord
+}
+
+class PatientRecord {
+- patientId : String
+- name : String
+- dateOfBirth : String
+- medicalHistory : List<String>
++ PatientRecord(patientId : String, name : String, dateOfBirth : String, medicalHistory : List<String>)
++ getPatientId() : String
++ getName() : String
++ getDateOfBirth() : String
++ getMedicalHistory() : List<String>
+}
+
+class IdentityManager {
+    - identifier : PatientIdentifier
+    - anomalyLog : List<String>
+    + processIncomingDataLinkage(incomingId : String) : void
+    - handleLinkageAnomaly(incomingId : String) : void
+}
+
+class DataStorage {
+    - patientDataMap : Map<String, List<PatientData>>
+    + storeData(data : PatientData) : void
+    + retrieveData(patientId : String) : List<PatientData>
+    + deleteData(patientId : String) : void
+    - executeSecureChannelWrite() : void
+}
+
+
+IdentityManager "1" *--> "1" PatientIdentifier : delegates matching to >
+PatientIdentifier ..> PatientRecord : instantiates/returns >
+IdentityManager ..> DataStorage : updates record connections in >
+
+@enduml
