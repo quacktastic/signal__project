@@ -1,30 +1,56 @@
 @startuml
 'https://plantuml.com/class-diagram
 
-interface DataListener {
+abstract class DataListener {
+    # parser : DataParser
+    # adapter : DataSourceAdapter
+    {abstract} + listen(): void
+    
+}
+
+class ConsoleDataListener extends DataListener {
+   + listen() : void
+
 
 }
 
-class ConsoleDataListener {
+class FileDataListener extends DataListener {
+   + listen() : void
 }
 
-class FileDataListener {
+class TcpDataListener extends DataListener {
+   + listen() : void
 }
 
-class TcpDataListener {
-}
-
-class WebSocketDataListener {
+class WebSocketDataListener extends DataListener {
+    + listen() : void
 }
 
 class DataParser {
+   + parseRawData(rawData: String): PatientData
 
 }
 
 class DataSourceAdapter {
+    + wireDataToStorage(data: PatientData): void
 
 }
 
+class PatientData {
+- patientId : String
+- metrics : Map<String, Double>
+- timestamp : long
++ PatientData(patientId : String, metrics : Map<String, Double>, timestamp : long)
++ getPatientId() : String
++ getMetrics() : Map<String, Double>
++ getTimestamp() : long
+}
+
+
+DataListener "1" *--> "1" DataParser : "delegates text parsing to >"
+DataListener "1" *--> "1" DataSourceAdapter : "routes clean payloads via >"
+DataParser ..> PatientData : "manufactures >"
+DataSourceAdapter ..> PatientData : "consumes >"
 
 
 @enduml
