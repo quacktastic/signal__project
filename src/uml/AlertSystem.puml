@@ -1,6 +1,14 @@
 @startuml
 'skinparam classAttributeIconSize 0
 
+class DataStorage {
+    - patientDataMap : Map<String, List<PatientData>>
+    + storeData(data : PatientData) : void
+    + retrieveData(patientId : String) : List<PatientData>
+    + deleteData(patientId : String) : void
+    - executeSecureChannelWrite() : void
+}
+
 class AlertGenerator {
     - dataStorage : DataStorage
     - alertManager : AlertManager
@@ -38,7 +46,8 @@ class PatientThresholds {
     - maxHeartRate : double
 }
 
-'--- Dependencies & Core Relationships ---
+'--- Dependencies & Core Relationships ---'
+AlertGenerator "1" --> "1" DataStorage : "queries historical trends"
 AlertGenerator "1" --> "1" AlertManager : "dispatches triggered alerts to"
 AlertGenerator ..> PatientThresholds : "queries limits during evaluation"
 AlertGenerator ..> Alert : "instantiates on threshold breach"

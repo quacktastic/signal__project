@@ -66,6 +66,7 @@ public class HealthDataSimulator {
      * @throws IOException if a file output directory path cannot be verified or created.
      */
     private static void parseArguments(String[] args) throws IOException {
+        int x = 1;
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -87,6 +88,8 @@ public class HealthDataSimulator {
                         String outputArg = args[++i];
                         if (outputArg.equals("console")) {
                             outputStrategy = new ConsoleOutputStrategy();
+                            x++;
+                            System.out.println(x);
                         } else if (outputArg.startsWith("file:")) {
                             String baseDirectory = outputArg.substring(5);
                             Path outputPath = Paths.get(baseDirectory);

@@ -1,56 +1,83 @@
 @startuml
-'https://plantuml.com/class-diagram
+skinparam classAttributeIconSize 0
 
-abstract class DataListener {
-    # parser : DataParser
-    # adapter : DataSourceAdapter
-    {abstract} + listen(): void
-    
+interface DataListener {
+    + startListening() : void
+    + stopListening() : void
+    + isListening() : boolean
 }
 
-class ConsoleDataListener extends DataListener {
-   + listen() : void
-
-
+class ConsoleDataListener implements DataListener {
+    + ConsoleDataListener()
+    + startListening() : void
+    + stopListening() : void
+    + isListening() : boolean
 }
 
-class FileDataListener extends DataListener {
-   + listen() : void
+class FileDataListener implements DataListener {
+    - filePath : String
+    + FileDataListener(filePath : String)
+    + startListening() : void
+    + stopListening() : void
+    + isListening() : boolean
 }
 
-class TcpDataListener extends DataListener {
-   + listen() : void
+class TcpDataListener implements DataListener {
+    - serverIp : String
+    - port : int
+    + TcpDataListener(serverIp : String, port : int)
+    + startListening() : void
+    + stopListening() : void
+    + isListening() : boolean
 }
 
-class WebSocketDataListener extends DataListener {
-    + listen() : void
+class WebSocketDataListener implements DataListener {
+    - endpointUri : String
+    + WebSocketDataListener(endpointUri : String)
+    + startListening() : void
+    + stopListening() : void
+    + isListening() : boolean
 }
 
 class DataParser {
-   + parseRawData(rawData: String): PatientData
-
-}
-
-class DataSourceAdapter {
-    + wireDataToStorage(data: PatientData): void
-
+    + parse(rawData : String) : PatientData
 }
 
 class PatientData {
-- patientId : String
-- metrics : Map<String, Double>
-- timestamp : long
-+ PatientData(patientId : String, metrics : Map<String, Double>, timestamp : long)
-+ getPatientId() : String
-+ getMetrics() : Map<String, Double>
-+ getTimestamp() : long
+    - patientId : String
+    - metrics : Map<String, Double>
+    - timestamp : long
+    + PatientData(patientId : String, metrics : Map<String, Double>, timestamp : long)
+    + getPatientId() : String
+    + getMetrics() : Map<String, Double>
+    + getTimestamp() : long
 }
 
+class DataSourceAdapter {
+    - sourceType : String
+    - activeListener : DataListener
+    - parser : DataParser
+    - dataStorage : DataStorage
+    + DataSourceAdapter(sourceType : String, listener : DataListener, parser : DataParser, dataStorage : DataStorage)
+    + onDataReceived(rawData : String) : void
+    + getSourceType() : String
+}
 
-DataListener "1" *--> "1" DataParser : "delegates text parsing to >"
-DataListener "1" *--> "1" DataSourceAdapter : "routes clean payloads via >"
-DataParser ..> PatientData : "manufactures >"
-DataSourceAdapter ..> PatientData : "consumes >"
+class DataStorage {
+    - patientDataMap : Map<String, List<PatientData>>
+    + storeData(data : PatientData) : void
+    + retrieveData(patientId : String) : List<PatientData>
+    + deleteData(patientId : String) : void
+    - executeSecureChannelWrite() : void
+}
 
+'--- Associations & Dependencies ---
+DataSourceAdapter "1" --> "1" DataListener : "manages & receives stream from"
+DataSourceAdapter "1" --> "1" DataParser : "delegates parsing to"
+DataSourceAdapter "1" --> "1" DataStorage : "forwards parsed data to"
+
+DataParser ..> PatientData : "instantiates"
+DataSourceAdapter ..> PatientData : "routes"
+DataStorage o-- "0..*" PatientData : "stores"
 
 @enduml
