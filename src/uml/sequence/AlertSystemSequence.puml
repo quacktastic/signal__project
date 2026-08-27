@@ -1,0 +1,55 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+
+actor "Medical Staff\n(Nurse / Clinician)" as Staff
+box "Alert Generation & Storage Subsystem" #F8F9FA
+participant "DataSourceAdapter" as Ingestion
+participant "AlertGenerator" as Generator
+participant "DataStorage" as Storage
+participant "Alert" as AlertObj
+participant "AlertManager" as Manager
+end box
+
+== 1. Telemetry Ingestion & Trend Evaluation ==
+Ingestion -> Generator : evaluateData(patientData)
+activate Generator
+
+Generator -> Generator : checkThreshold(patientData)
+note right: Current metric exceeds threshold\n(e.g., Heart Rate > 100 bpm)
+
+Generator -> Storage : retrieveData(patientId)
+activate Storage
+Storage --> Generator : return historicalData (List<PatientData>)
+deactivate Storage
+
+Generator -> Generator : evaluateTrend(historicalData)
+note right: Confirms continuing trend\nover time window
+
+== 2. Alert Generation & Dispatch ==
+create AlertObj
+Generator -> AlertObj : new(patientId, condition, timestamp)
+Generator -> Manager : triggerAlert(alert)
+deactivate Generator
+activate Manager
+
+Manager -> Staff : dispatchNotification(alert)
+note right: Alert enters "Sent" state;\nworkstation & mobile alerted
+
+== 3. Staff Acknowledgment ==
+Staff -> Manager : acknowledgeAlert(alertId)
+note left: Manual click OR\nopened patient view
+Manager -> AlertObj : setStatus("ACKNOWLEDGED")
+Manager --> Staff : confirmAcknowledgment()
+
+== 4. Intervention & Resolution ==
+note over Staff: Nurse assesses patient,\nadministers intervention,\nand patient stabilizes
+
+Staff -> Manager : resolveAlert(alertId)
+Manager -> AlertObj : setStatus("RESOLVED")
+Manager -> Storage : storeData(resolvedAlertData)
+Manager --> Staff : confirmResolution()
+deactivate Manager
+
+@enduml

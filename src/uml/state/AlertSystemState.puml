@@ -1,0 +1,35 @@
+@startuml
+skinparam state {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    ArrowColor Black
+}
+
+[*] --> Generated : Patient data exceeds threshold criteria
+
+state Generated {
+    Generated : entry / Instantiate Alert object
+    Generated : entry / Record patientId, condition, timestamp
+}
+
+Generated --> Sent : AlertManager dispatches notification
+
+state Sent {
+    Sent : Displayed on staff workstation
+}
+
+Sent --> Acknowledged : Medical staff clicks notification OR opens patient view
+
+state Acknowledged {
+    Acknowledged : Notification silenced; staff investigating
+}
+
+Acknowledged --> Resolved : [Automatic] Readings stay normal continuously for set duration
+Acknowledged --> Resolved : [Manual] Medical staff completes intervention & resolves alert
+
+state Resolved {
+    Resolved : entry / Alert closed and archived
+}
+
+Resolved --> [*]
+@enduml
